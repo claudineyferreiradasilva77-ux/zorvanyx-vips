@@ -193,6 +193,45 @@
       <div class="plan-card">
         <h3>✦ VIP NORMAL ✦</h3>
 
+        <div class="plan-price">R$ 8,00 <small>/ 30 dias (pagamento único)</small></div>
+        <ul>
+          <li><strong>1 Baú de Pet Raro</strong> na ativação</li>
+          <li><strong>/vipkit1</strong> liberado a cada 3 dias</li>
+          <li>Caixa de Shulker com Armadura Ferro + Molde Diamante</li>
+          <li>Espada, Picareta e Machado de Diamante</li>
+          <li>3x Maçã Dourada + 2x Encantada + 1 Totem</li>
+          <li><strong>Ao vencer os 30 dias:</strong> você mantém todos os seus itens e Shulkers!</li>
+        </ul>
+        <button type="button" class="btn-neon" onclick="iniciarCompra('normal')">PAGAR VIP NORMAL (PIX / CARTÃO)</button>
+      </div>
+
+      <div class="plan-card prem">
+        <h3 style="color:#facc15;">✦ VIP PREMIUM ✦</h3>
+        <div class="plan-price">R$ 29,90 <small>/ 30 dias (pagamento único)</small></div>
+        <ul>
+          <li><strong>1 Baú de Pet Raro</strong> na ativação</li>
+          <li><strong>/vipkit2</strong> liberado a cada 3 dias</li>
+          <li>Caixa de Shulker com Armadura <strong>Full Diamante</strong> + Molde</li>
+          <li><strong>Espada de Netherite</strong> + Ferramentas de Diamante</li>
+          <li>3x Maçã Dourada + 2x Encantada + 1 Totem</li>
+          <li><strong>Ao vencer os 30 dias:</strong> você mantém todos os seus itens e Shulkers!</li>
+        </ul>
+        <button type="button" class="btn-neon" style="background:linear-gradient(90deg,#eab308,#fde047);" onclick="iniciarCompra('premium')">PAGAR VIP PREMIUM (PIX / CARTÃO)</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="code-box" id="modalCodigo">
+    <div class="code-card">
+      <h3 style="font-family:'Chakra Petch',sans-serif; color:#34d399; font-size:1.5rem;">✔ PAGAMENTO APROVADO!</h3>
+      <p id="descCodigo" style="color:#94a3b8; font-size:0.92rem; margin-top:8px;">Copie o comando abaixo e cole no chat do servidor:</p>
+      <div class="cmd-copy" id="comandoFinal">/vipcode AGUARDANDO...</div>
+      <button type="button" class="btn-neon" onclick="copiarComando()">COPIAR COMANDO /VIPCODE</button>
+      <button type="button" style="margin-top:10px; background:transparent; border:1px solid #334155; color:#94a3b8; padding:8px 16px; border-radius:8px; cursor:pointer;" onclick="fecharModal()">Fechar</button>
+    </div>
+  </div>
+
+  <script>
     var launcherAtual = "original";
 
     function irParaPlanos() {
