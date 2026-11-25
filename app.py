@@ -3,7 +3,8 @@ import random
 import hmac
 import hashlib
 import json
-import requests
+import urllib.request
+import urllib.error
 from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 from pyramid.response import Response
@@ -23,6 +24,23 @@ def gerar_codigo_vip(nick: str, plano: str, payment_id: str) -> str:
     assinatura = hmac.new(CHAVE_ASSINATURA.encode("utf-8"), base, hashlib.sha256).hexdigest()[:6].upper()
     num = "".join(c for c in str(payment_id) if c.isdigit())[-4:].zfill(4)
     return f"ZVX-{prefixo}-{num}-{assinatura}"
+
+def mp_request(url: str, data: dict = None) -> dict:
+    headers = {
+        "Authorization": f"Bearer {MP_ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    body = json.dumps(data).encode("utf-8") if data is not None else None
+    req = urllib.request.Request(url, data=body, headers=headers, method="POST" if data else "GET")
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode("utf-8", errors="ignore")
+        try:
+            return json.loads(err_body)
+        except Exception:
+            return {"message": err_body or str(e)}
 
 def pagina_loja(request):
     with open("index.html", "r", encoding="utf-8") as f:
@@ -73,13 +91,7 @@ def criar_pagamento(request):
             "auto_return": "approved"
         }
 
-        headers = {
-            "Authorization": f"Bearer {MP_ACCESS_TOKEN}",
-            "Content-Type": "application/json"
-        }
-
-        resp = requests.post("https://mercadopago.com", json=payload, headers=headers, timeout=15)
-        res_json = resp.json()
+        res_json = mp_request("https://mercadopago.com", payload)
 
         if "init_point" in res_json:
             return Response(json.dumps({"checkout_url": res_json["init_point"]}), content_type="application/json")
@@ -106,7 +118,7 @@ def pagina_checkout_teste(request):
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZORVANYX • Checkout (Modo Teste)</title>
+  <title>ZORVANYX • Checkout VIP</title>
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }}
     body {{
@@ -139,11 +151,15 @@ def pagina_checkout_teste(request):
       width: 100%; padding: 14px; border: none; border-radius: 12px; margin-top: 16px;
       background: {cor}; color: #04100a; font-weight: 800; font-size: 1rem; cursor: pointer;
     }}
+    .btn-voltar {{
+      width: 100%; padding: 10px; border: 1px solid #334155; border-radius: 10px; margin-top: 10px;
+      background: transparent; color: #94a3b8; cursor: pointer;
+    }}
   </style>
 </head>
 <body>
   <div class="box">
-    <div class="tag-teste">⚡ AMBIENTE DE TESTE DA GUI</div>
+    <div class="tag-teste">⚡ CHECKOUT DE TESTE DA GUI</div>
     <h2>{nome_plano} • {valor}</h2>
     <p class="resumo">Jogador: <strong>{nick}</strong> • Duração: 30 dias únicos</p>
 
@@ -169,6 +185,7 @@ def pagina_checkout_teste(request):
     <button class="btn-pay" onclick="window.location.href='/?status=aprovado&nick={nick}&plano={plano}'">
       ✔ SIMULAR PAGAMENTO APROVADO
     </button>
+    <button class="btn-voltar" onclick="window.location.href='/'">⬅ Voltar para a Loja</button>
   </div>
   <script>
     function mudar(m) {{
@@ -190,15 +207,13 @@ def webhook_mp(request):
             payment_id = body.get("data", {}).get("id")
 
         if payment_id:
-            headers = {"Authorization": f"Bearer {MP_ACCESS_TOKEN}"}
-            r = requests.get(f"https://mercadopago.com{payment_id}", headers=headers, timeout=10)
-            pagamento = r.json()
+            pagamento = mp_request(f"https://mercadopago.com{payment_id}")
             if pagamento.get("status") == "approved":
                 ref = pagamento.get("external_reference", "")
                 if "|" in ref:
                     partes = ref.split("|")
-                    nick = partes
-                    plano = partes
+                    nick = partes[0]
+                    plano = partes[1]
                     codigo = gerar_codigo_vip(nick, plano, str(payment_id))
                     PAGAMENTOS_APROVADOS[f"{nick.lower()}:{plano}"] = codigo
     except Exception:
@@ -212,18 +227,15 @@ def consultar_codigo(request):
 
     if payment_id and MP_ACCESS_TOKEN.startswith("APP_USR") and "SEU_TOKEN_AQUI" not in MP_ACCESS_TOKEN:
         try:
-            headers = {"Authorization": f"Bearer {MP_ACCESS_TOKEN}"}
-            r = requests.get(f"https://mercadopago.com{payment_id}", headers=headers, timeout=10)
-            pag = r.json()
+            pag = mp_request(f"https://mercadopago.com{payment_id}")
             if pag.get("status") == "approved":
                 ref = pag.get("external_reference", "")
                 if "|" in ref:
                     partes = ref.split("|")
-                    p_nick = partes
-                    p_plano = partes
+                    p_nick = partes[0]
+                    p_plano = partes[1]
                     cod = gerar_codigo_vip(p_nick, p_plano, payment_id)
                     PAGAMENTOS_APROVADOS[f"{p_nick.lower()}:{p_plano}"] = cod
-
         except Exception:
             pass
 
@@ -252,4 +264,3 @@ if __name__ == "__main__":
     porta = int(os.environ.get("PORT", 8080))
     server = make_server("0.0.0.0", porta, app)
     server.serve_forever()
-    
