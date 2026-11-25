@@ -4,123 +4,95 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZORVANYX • Loja Oficial VIP</title>
-  <script src="https://cloudflare.com"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
     body {
       background: radial-gradient(circle at top, #0f1c3f 0%, #060913 70%);
-      color: #fff;
-      min-height: 100vh;
-      overflow-x: hidden;
+      color: #fff; min-height: 100vh; overflow-x: hidden;
     }
-    canvas#particles {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    }
-    .container {
-      position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 40px 20px;
-    }
-    header {
-      text-align: center; margin-bottom: 45px; animation: fadeDown 0.8s ease;
-    }
+    canvas#particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .container { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 40px 20px; }
+    header { text-align: center; margin-bottom: 45px; }
     .badge {
       display: inline-block; padding: 6px 16px; border-radius: 999px;
       background: rgba(0, 212, 255, 0.12); border: 1px solid rgba(0, 212, 255, 0.4);
       color: #38bdf8; font-weight: 700; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 12px;
     }
     h1 {
-      font-size: 3rem; font-weight: 900; letter-spacing: 2px;
+      font-size: 2.8rem; font-weight: 900; letter-spacing: 2px;
       background: linear-gradient(90deg, #38bdf8, #facc15, #38bdf8);
       background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       animation: shine 4s linear infinite;
     }
     header p { color: #94a3b8; margin-top: 8px; font-size: 1.05rem; }
-
-    .grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px;
+    .aviso-topo {
+      display: none; background: rgba(34, 197, 94, 0.18); border: 1px solid #22c55e;
+      color: #86efac; padding: 14px; border-radius: 14px; text-align: center; margin-bottom: 24px; font-weight: 700;
     }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px; }
     .card {
-      background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(14px);
-      border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 22px; padding: 30px;
-      transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
-      animation: fadeUp 0.9s ease;
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 22px; padding: 30px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     }
-    .card:hover {
-      transform: translateY(-10px) scale(1.01);
-      border-color: #38bdf8;
-      box-shadow: 0 20px 45px rgba(56, 189, 248, 0.22);
-    }
+    .card:hover { transform: translateY(-8px); border-color: #38bdf8; box-shadow: 0 20px 45px rgba(56, 189, 248, 0.22); }
     .card.premium { border-color: rgba(250, 204, 21, 0.45); }
-    .card.premium:hover {
-      border-color: #facc15;
-      box-shadow: 0 20px 45px rgba(250, 204, 21, 0.25);
-    }
+    .card.premium:hover { border-color: #facc15; box-shadow: 0 20px 45px rgba(250, 204, 21, 0.25); }
     .tag-vip { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; }
     .normal .tag-vip { color: #38bdf8; }
     .premium .tag-vip { color: #facc15; }
-    .card h2 { font-size: 1.9rem; margin: 6px 0 14px; }
-    .price { font-size: 2.5rem; font-weight: 900; color: #4ade80; margin-bottom: 20px; }
+    .card h2 { font-size: 1.85rem; margin: 6px 0 14px; }
+    .price { font-size: 2.4rem; font-weight: 900; color: #4ade80; margin-bottom: 20px; }
     .price span { font-size: 0.95rem; color: #94a3b8; font-weight: 500; }
-
     ul { list-style: none; margin-bottom: 26px; }
     ul li {
       padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
-      color: #e2e8f0; font-size: 0.96rem; display: flex; align-items: center; gap: 10px;
+      color: #e2e8f0; font-size: 0.95rem; display: flex; align-items: center; gap: 10px;
     }
     ul li::before { content: "✦"; color: #38bdf8; font-weight: bold; }
     .premium ul li::before { color: #facc15; }
-
     .btn {
       width: 100%; padding: 15px; border: none; border-radius: 14px;
-      font-size: 1.05rem; font-weight: 800; cursor: pointer; transition: 0.25s;
+      font-size: 1.02rem; font-weight: 800; cursor: pointer; transition: 0.25s;
       text-transform: uppercase; letter-spacing: 1px;
     }
     .btn-normal { background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; }
     .btn-premium { background: linear-gradient(135deg, #d97706, #facc15); color: #090d16; }
     .btn:hover { filter: brightness(1.12); transform: scale(1.02); }
 
-    /* Modal PIX */
     .modal-bg {
-      display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.85);
-      backdrop-filter: blur(8px); z-index: 10; align-items: center; justify-content: center; padding: 20px;
+      display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(8px); z-index: 20; align-items: center; justify-content: center; padding: 20px;
     }
     .modal {
       background: #0f172a; border: 1px solid #38bdf8; border-radius: 22px;
       max-width: 440px; width: 100%; padding: 28px; text-align: center;
-      animation: popIn 0.3s ease;
     }
-    .modal h3 { font-size: 1.5rem; margin-bottom: 6px; color: #38bdf8; }
+    .modal h3 { font-size: 1.45rem; margin-bottom: 8px; color: #38bdf8; }
     .modal input {
-      width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #334155;
-      background: #020617; color: #fff; font-size: 1rem; margin: 12px 0; text-align: center;
+      width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #334155;
+      background: #020617; color: #fff; font-size: 1.05rem; margin: 14px 0; text-align: center;
     }
-    #qrcode {
-      background: #fff; padding: 14px; border-radius: 16px; display: inline-block; margin: 10px 0;
-    }
-    .pix-code {
-      background: #020617; border: 1px dashed #475569; padding: 10px; border-radius: 10px;
-      font-size: 0.75rem; color: #94a3b8; word-break: break-all; margin: 10px 0; max-height: 68px; overflow-y: auto;
-    }
+    .metodos { display: flex; justify-content: center; gap: 10px; margin-bottom: 14px; font-size: 0.85rem; color: #cbd5e1; }
+    .metodos span { background: #1e293b; padding: 6px 12px; border-radius: 8px; border: 1px solid #334155; }
     .close-btn {
       margin-top: 12px; background: transparent; border: 1px solid #475569;
       color: #94a3b8; padding: 8px 18px; border-radius: 10px; cursor: pointer;
     }
     @keyframes shine { to { background-position: 200% center; } }
-    @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
   </style>
 </head>
 <body>
   <canvas id="particles"></canvas>
   <div class="container">
+    <div id="avisoTopo" class="aviso-topo"></div>
     <header>
       <div class="badge">SERVIDOR SURVIVAL 1.21.1 • ZORVANYX</div>
       <h1>LOJA OFICIAL DE VIPS</h1>
-      <p>Escolha seu plano mensal, pague via PIX instantâneo e receba suas recompensas exclusivas!</p>
+      <p>Pague via PIX ou Cartão de Crédito com ativação automática dentro do servidor!</p>
     </header>
 
     <div class="grid">
-      <!-- VIP NORMAL -->
       <div class="card normal">
         <div class="tag-vip">Plano Mensal • 30 Dias</div>
         <h2>✦ VIP NORMAL ✦</h2>
@@ -133,10 +105,9 @@
           <li>Espada, Picareta e Machado de Diamante</li>
           <li>3x Maçã Dourada + 2x Maçã Encantada + 1 Totem</li>
         </ul>
-        <button class="btn btn-normal" onclick="abrirPix('normal')">Comprar VIP Normal</button>
+        <button type="button" class="btn btn-normal" id="btnNormal">Comprar VIP Normal</button>
       </div>
 
-      <!-- VIP PREMIUM -->
       <div class="card premium">
         <div class="tag-vip">Mais Vendido • 30 Dias</div>
         <h2>✦ VIP PREMIUM ✦</h2>
@@ -149,81 +120,95 @@
           <li><strong>Espada de Netherite</strong> + Ferramentas de Diamante</li>
           <li>3x Maçã Dourada + 2x Maçã Encantada + 1 Totem</li>
         </ul>
-        <button class="btn btn-premium" onclick="abrirPix('premium')">Comprar VIP Premium</button>
+        <button type="button" class="btn btn-premium" id="btnPremium">Comprar VIP Premium</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL PIX -->
-  <div class="modal-bg" id="modalPix">
+  <div class="modal-bg" id="modalCheckout">
     <div class="modal">
-      <h3 id="modalTitulo">PAGAMENTO VIA PIX</h3>
+      <h3 id="modalTitulo">FINALIZAR COMPRA</h3>
       <p style="color:#94a3b8; font-size:0.9rem;">Digite seu nick exato do Minecraft (Java ou Bedrock):</p>
-      <input type="text" id="nickJogador" placeholder="Ex: Pedrinhodograu67" />
-      <div id="qrcode"></div>
-      <div class="pix-code" id="pixTexto"></div>
-      <button class="btn btn-normal" onclick="copiarPix()">Copiar Código PIX (Copia e Cola)</button>
-      <p style="color:#facc15; font-size:0.82rem; margin-top:12px;">
-        Após pagar, envie o comprovante e seu nick no nosso Discord para ativação imediata!
-      </p>
-      <button class="close-btn" onclick="fecharPix()">Fechar</button>
+      <input type="text" id="nickJogador" placeholder="Seu nick no servidor..." />
+      <div class="metodos">
+        <span>⚡ PIX Instantâneo</span>
+        <span>💳 Cartão de Crédito</span>
+      </div>
+      <button type="button" class="btn btn-normal" id="btnIrPagar">Ir para Pagamento Seguro</button>
+      <p id="msgErro" style="color:#f87171; font-size:0.85rem; margin-top:10px;"></p>
+      <button type="button" class="close-btn" id="btnFechar">Cancelar</button>
     </div>
   </div>
 
   <script>
-    const PAYLOAD_NORMAL = "__PIX_NORMAL__";
-    const PAYLOAD_PREMIUM = "__PIX_PREMIUM__";
-    const PLANO_URL = "__PLANO_INICIAL__";
-    let codigoAtual = "";
+    let planoSelecionado = "normal";
+    const modal = document.getElementById("modalCheckout");
+    const titulo = document.getElementById("modalTitulo");
+    const msgErro = document.getElementById("msgErro");
+    const btnIrPagar = document.getElementById("btnIrPagar");
 
-    function abrirPix(plano) {
-      const modal = document.getElementById("modalPix");
-      const titulo = document.getElementById("modalTitulo");
-      const qrDiv = document.getElementById("qrcode");
-      const pixTexto = document.getElementById("pixTexto");
-
-      qrDiv.innerHTML = "";
+    function abrirModal(plano) {
+      planoSelecionado = plano;
+      msgErro.innerText = "";
       if (plano === "premium") {
         titulo.innerText = "VIP PREMIUM • R$ 29,90";
         titulo.style.color = "#facc15";
-        codigoAtual = PAYLOAD_PREMIUM;
       } else {
         titulo.innerText = "VIP NORMAL • R$ 8,00";
         titulo.style.color = "#38bdf8";
-        codigoAtual = PAYLOAD_NORMAL;
       }
-
-      pixTexto.innerText = codigoAtual;
-      new QRCode(qrDiv, { text: codigoAtual, width: 190, height: 190 });
       modal.style.display = "flex";
     }
 
-    function fecharPix() {
-      document.getElementById("modalPix").style.display = "none";
-    }
+    document.getElementById("btnNormal").addEventListener("click", () => abrirModal("normal"));
+    document.getElementById("btnPremium").addEventListener("click", () => abrirModal("premium"));
+    document.getElementById("btnFechar").addEventListener("click", () => { modal.style.display = "none"; });
 
-    function copiarPix() {
+    btnIrPagar.addEventListener("click", async () => {
       const nick = document.getElementById("nickJogador").value.trim();
-      if (!nick) {
-        alert("Digite seu nick do Minecraft antes de copiar o PIX!");
+      if (!nick || nick.length < 3) {
+        msgErro.innerText = "Por favor, digite seu nick do Minecraft!";
         return;
       }
-      navigator.clipboard.writeText(codigoAtual);
-      alert("Código PIX copiado para o nick " + nick + "! Abra o app do seu banco e cole em PIX Copia e Cola.");
-    }
+      btnIrPagar.innerText = "GERANDO PAGAMENTO...";
+      btnIrPagar.disabled = true;
+      msgErro.innerText = "";
 
-    if (PLANO_URL === "premium") abrirPix("premium");
+      try {
+        const resp = await fetch("/api/pagar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nick: nick, plano: planoSelecionado })
+        });
+        const data = await resp.json();
+        if (data.checkout_url) {
+          window.location.href = data.checkout_url;
+        } else {
+          msgErro.innerText = data.erro || "Erro ao iniciar pagamento.";
+          btnIrPagar.innerText = "Ir para Pagamento Seguro";
+          btnIrPagar.disabled = false;
+        }
+      } catch (e) {
+        msgErro.innerText = "Falha de conexão com o servidor.";
+        btnIrPagar.innerText = "Ir para Pagamento Seguro";
+        btnIrPagar.disabled = false;
+      }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("status") === "aprovado") {
+      const aviso = document.getElementById("avisoTopo");
+      aviso.style.display = "block";
+      aviso.innerText = "✔ Pagamento aprovado! Seu VIP e seu Baú de Pet Raro serão entregues automaticamente no servidor em até 15 segundos!";
+    }
 
     const canvas = document.getElementById("particles");
     const ctx = canvas.getContext("2d");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    const pts = Array.from({ length: 55 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 2.2 + 0.8,
-      dx: (Math.random() - 0.5) * 0.6,
-      dy: (Math.random() - 0.5) * 0.6,
+    const pts = Array.from({ length: 50 }, () => ({
+      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+      r: Math.random() * 2 + 0.8, dx: (Math.random() - 0.5) * 0.5, dy: (Math.random() - 0.5) * 0.5,
       c: Math.random() > 0.5 ? "#38bdf8" : "#facc15"
     }));
     function animar() {
@@ -232,3 +217,12 @@
         p.x += p.dx; p.y += p.dy;
         if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
         if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.c; ctx.fill();
+      });
+      requestAnimationFrame(animar);
+    }
+    animar();
+  </script>
+</body>
+</html>
