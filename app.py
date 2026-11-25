@@ -30,6 +30,13 @@ def pagina_loja(request):
 
 def criar_pagamento(request):
     try:
+        if not MP_ACCESS_TOKEN or "SEU_TOKEN_AQUI" in MP_ACCESS_TOKEN:
+            return Response(
+                json.dumps({"erro": "Falta colocar seu Access Token do Mercado Pago no arquivo app.py!"}),
+                status=400,
+                content_type="application/json"
+            )
+
         dados = request.json_body
         nick = str(dados.get("nick", "")).strip()
         launcher = str(dados.get("launcher", "original")).strip()
@@ -76,9 +83,10 @@ def criar_pagamento(request):
         if "init_point" in res_json:
             return Response(json.dumps({"checkout_url": res_json["init_point"]}), content_type="application/json")
         else:
-            return Response(json.dumps({"erro": "Configure seu Access Token do Mercado Pago no app.py!"}), status=400, content_type="application/json")
+            detalhe = res_json.get("message", "Token do Mercado Pago inválido.")
+            return Response(json.dumps({"erro": f"Mercado Pago: {detalhe}"}), status=400, content_type="application/json")
     except Exception as e:
-        return Response(json.dumps({"erro": str(e)}), status=500, content_type="application/json")
+        return Response(json.dumps({"erro": f"Erro interno: {str(e)}"}), status=500, content_type="application/json")
 
 def webhook_mp(request):
     try:
@@ -95,7 +103,8 @@ def webhook_mp(request):
                 ref = pagamento.get("external_reference", "")
                 if "|" in ref:
                     partes = ref.split("|")
-                    nick, plano = partes[0], partes[1]
+                    nick = partes[0]
+                    plano = partes[1]
                     codigo = gerar_codigo_vip(nick, plano, str(payment_id))
                     PAGAMENTOS_APROVADOS[f"{nick.lower()}:{plano}"] = codigo
     except Exception:
@@ -115,7 +124,9 @@ def consultar_codigo(request):
             if pag.get("status") == "approved":
                 ref = pag.get("external_reference", "")
                 if "|" in ref:
-                    p_nick, p_plano = ref.split("|")[:2]
+                    partes = ref.split("|")
+                    p_nick = partes[0]
+                    p_plano = partes[1]
                     cod = gerar_codigo_vip(p_nick, p_plano, payment_id)
                     PAGAMENTOS_APROVADOS[f"{p_nick.lower()}:{p_plano}"] = cod
         except Exception:
