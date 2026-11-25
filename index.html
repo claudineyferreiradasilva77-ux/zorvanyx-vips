@@ -263,7 +263,7 @@
       document.getElementById("planos").scrollIntoView({ behavior: "smooth" });
     }
 
-    async function iniciarCompra(plano) {
+    function iniciarCompra(plano) {
       const nick = document.getElementById("inputNick").value.trim();
       const senha = document.getElementById("inputSenha").value.trim();
 
@@ -277,6 +277,9 @@
         document.getElementById("inputSenha").focus();
         return;
       }
+
+      window.location.href = `/checkout?nick=${encodeURIComponent(nick)}&plano=${encodeURIComponent(plano)}&launcher=${encodeURIComponent(launcherAtual)}`;
+    }
 
       try {
         const resp = await fetch("/api/pagar", {
